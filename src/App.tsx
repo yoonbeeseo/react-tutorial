@@ -1,38 +1,83 @@
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
+import { dbService } from "./lib/firebase"
 
-//Todo Person type 만들기 name: string, age: number
-type Person = {
-  name: string
-  age: number
+const col = "todos"
+
+interface Todo {
+  title: string
+  id?: string
 }
-
-type Pet = {
-  name: string
-  weight: number
-  age: number
-  desexed: boolean
-}
-
-//Todo Pet type 만들기 name: string; age: number; weight: number; desexed: boolean
-
 const App = () => {
-  const [a, setA] = useState<string>("")
-  const [b, setB] = useState<number>(0)
+  const [todos, setTodos] = useState<Todo[]>([])
 
-  const [pet1, setPet1] = useState<Pet>({ age: 12, name: "Mario", desexed: false, weight: 5.2 }) //Todo: Pet 1 만들기
-  const [p1, setP1] = useState<Person>({ age: 12, name: "Mario" }) //Todo: Person 1 만들기
+  const B = () =>
+    new Promise((ok, no) => {
+      setTimeout(() => {
+        console.log("b")
+        ok("ok")
+      }, 500)
+    })
 
-  const [pets, setPets] = useState<Array<Pet>>([]) // Pet을 담은 배열
-  const [people, setPeople] = useState<Person[]>([]) // Person 을 담은 배열
+  // async () => {}
+  const onAdd = async () => {
+    await dbService.collection(col).add({ title: "타입스크립트 배우기" })
+    console.log("추가되었습니다.")
+  }
+
+  // async await
+  // try catch
+  const onDelete = async (id: string) => {
+    //! try 안의 코드를 실행시켜봅니다. 만약 에러가 없다면 await다음줄을 실행해줌
+    try {
+      if (!id) {
+        return alert("Need ID!")
+      }
+      await dbService.collection(col).doc(id).delete()
+      console.log("삭제되었습니다.")
+    } catch (error: any) {
+      //! try하는 부분의 코드에서 에러가 있다면 error를 받아옵니다.
+      //! error 은 any로 주면 됨
+      alert(error.message)
+    }
+  }
+
+  const onEdit = async (updatedTodo: Todo) => {
+    try {
+      await dbService.collection(col).doc(updatedTodo.id).set(updatedTodo)
+      console.log("수정되었습니다.")
+    } catch (error: any) {
+      alert(error.message)
+    }
+  }
 
   useEffect(() => {
-    //Todo: pets에 pet1 추가하기
-    setPets((prev) => [...prev, pet1])
-    //Todo: people에 p1 추가하기
-    setPeople((prev) => [...prev, p1])
+    const subTodos = dbService.collection(col).onSnapshot((snap) => {
+      const data = snap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+      console.log("data fetched")
+      setTodos(data as Todo[])
+    })
+
+    subTodos
+    return subTodos
   }, [])
 
-  return <h1>App</h1>
+  return (
+    <div>
+      <h1>App</h1>
+      <button onClick={onAdd}>ADD</button>
+
+      <ul>
+        {todos.map((todo, index) => (
+          //! !는 무조건 있다 라는 뜻으로 변수 마지막에 붙이면 됨
+          <li className="border" key={index} onClick={() => onEdit({ title: todo.title.concat(" 끝냄!!") })}>
+            {todo.title}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
 }
 
 export default App
+
+//!

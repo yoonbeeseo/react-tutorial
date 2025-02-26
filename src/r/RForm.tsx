@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, FormEvent } from "react"
 import { v4 } from "uuid"
-import { FaRegTrashCan, FaRotate } from "react-icons/fa6"
+import { FaRegTrashCan, FaRotate, FaPlus } from "react-icons/fa6"
 
 interface Props {
   payload?: Requirement
@@ -36,7 +36,47 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    console.log({ isInsertingDesc })
+    if (isInsertingDesc) {
+      return
+    }
+
+    if (requirement.title.length === 0) {
+      alert("기능 이름을 적어주세요.")
+      return setTimeout(() => titleRef.current?.focus(), 100)
+    }
+
+    if (requirement.status.length === 0) {
+      alert("진행상태를 선택해주세요.")
+      return setTimeout(() => statusRef.current?.showPicker())
+    }
+
+    if (requirement.manager.length === 0) {
+      if (directInserting) {
+        alert("담당자를 입력해주세요.")
+        return setTimeout(() => managerRef2.current?.focus(), 100)
+      }
+
+      alert("담당자를 선택해주세요.")
+      return setTimeout(() => managerRef.current?.showPicker(), 100)
+    }
+
+    alert(payload ? "요구사항을 수정했습니다." : "요구사항을 추가했습니다.")
+
+    onDone(requirement)
+
+    if (!payload) {
+      setRequirement({
+        descs: [],
+        id: v4(),
+        manager: "",
+        status: "",
+        title: "",
+      })
+
+      setTimeout(() => titleRef.current?.focus(), 100)
+      return
+    }
+    onCancel()
   }
 
   useEffect(
@@ -46,20 +86,8 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
     [] // 빈배열이란 해당 컴포넌트가 최초 렌데링 되는 시점에 딱 한 번 실행할 코드
   )
 
-  useEffect(() => {
-    const checkKey = (e: KeyboardEvent) => {
-      console.log(e.key)
-    }
-
-    window.addEventListener("keydown", checkKey)
-
-    return () => {
-      window.removeEventListener("keydown", checkKey)
-    }
-  }, [])
-
   return (
-    <form className="flex flex-col gap-y-2.5 border max-w-225 mx-auto" onSubmit={onSubmit}>
+    <form className="flex flex-col gap-y-2.5 max-w-225 mx-auto p-5 md:px-0" onSubmit={onSubmit}>
       <div className={div}>
         <label htmlFor="title" className={label}>
           기능 이름
@@ -84,7 +112,17 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
             <li key={index} className="flex">
               <div className="text-xs bg-gray-50 rounded p-1 text-gray-700 hover:shadow-md flex gap-x-2">
                 {index + 1}. {d}
-                <button type="button" className="cursor-pointer hover:text-red-500">
+                <button
+                  type="button"
+                  className="cursor-pointer hover:text-red-500"
+                  onClick={() => {
+                    const descs = [...requirement.descs]
+
+                    descs.splice(index, 1)
+
+                    setRequirement((prev) => ({ ...prev, descs }))
+                  }}
+                >
                   <FaRegTrashCan />
                 </button>
               </div>
@@ -92,27 +130,47 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
           ))}
         </ul>
 
-        <input
-          type="text"
-          id="desc"
-          value={desc}
-          onChange={(e) => setDesc(e.target.value)}
-          ref={descRef}
-          className={input}
-          onFocus={() => setIsInsertingDesc(true)}
-          onBlur={() => setIsInsertingDesc(false)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              if (desc.length === 0) {
-                alert("상세 내용을 입력해주세요.")
-                return setTimeout(() => descRef.current?.focus(), 100)
+        {isInsertingDesc && (
+          <input
+            type="text"
+            id="desc"
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
+            ref={descRef}
+            className={input}
+            onFocus={() => setIsInsertingDesc(true)}
+            onBlur={() => setIsInsertingDesc(false)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                if (desc.length === 0) {
+                  alert("상세 내용을 입력해주세요.")
+                  return setTimeout(() => descRef.current?.focus(), 100)
+                }
+
+                if (e.nativeEvent.isComposing) {
+                  return
+                }
+                setRequirement((prev) => ({ ...prev, descs: [...prev.descs, desc] }))
+                setDesc("")
+                setTimeout(() => descRef.current?.focus(), 100)
+              } else if (e.key === "Tab") {
+                setIsInsertingDesc(false)
+                setTimeout(() => statusRef.current?.showPicker(), 100)
               }
-              setRequirement((prev) => ({ ...prev, descs: [...prev.descs, desc] }))
-              setDesc("")
-              setTimeout(() => descRef.current?.focus(), 100)
-            }
+            }}
+          />
+        )}
+
+        <button
+          className="w-full rounded bg-gray-50 flex justify-center h-10 items-center hover:opacity-80 active:opacity-50 hover:bg-gray-100 cursor-pointer"
+          type="button"
+          onClick={() => {
+            setIsInsertingDesc(true)
+            setTimeout(() => descRef.current?.focus(), 100)
           }}
-        />
+        >
+          <FaPlus />
+        </button>
       </div>
 
       <div className="flex gap-x-2.5 items-end">
@@ -126,7 +184,15 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
               id="status"
               value={requirement.status}
               className={select}
-              onChange={(e) => setRequirement((prev) => ({ ...prev, status: e.target.value as RequirementStatus }))}
+              onChange={(e) => {
+                setRequirement((prev) => ({ ...prev, status: e.target.value as RequirementStatus }))
+                setTimeout(() => {
+                  if (directInserting) {
+                    return managerRef2.current?.focus()
+                  }
+                  managerRef.current?.showPicker()
+                }, 100)
+              }}
             >
               <option>선택</option>
 

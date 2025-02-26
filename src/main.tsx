@@ -7,6 +7,7 @@ import RContainer from "./r/RContainer.tsx"
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RContainer />
+    {/* <RContainer /> */}
+    <App />
   </StrictMode>
 )
