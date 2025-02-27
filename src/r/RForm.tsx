@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { v4 } from "uuid"
 import { FaRegTrashCan, FaRotate, FaPlus } from "react-icons/fa6"
 import { Button, Container, Form } from "../ui"
@@ -13,15 +13,19 @@ interface Props {
 }
 
 const RForm = ({ onCancel, onDone, payload }: Props) => {
-  const [requirement, setRequirement] = useState<Requirement>(
-    payload ?? {
-      descs: [],
-      id: v4(),
-      manager: "",
-      status: "",
-      title: "",
-    }
-  )
+  const initialState = useMemo<Requirement>(() => {
+    return (
+      payload ?? {
+        descs: [],
+        id: v4(),
+        manager: "",
+        status: "",
+        title: "",
+      }
+    )
+  }, [payload])
+
+  const [requirement, setRequirement] = useState(initialState)
 
   const [isInsertingDesc, setIsInsertingDesc] = useState<boolean>(false) // 내가 지금 작성하고 있는 아이템이 desc인지 확인용
 
@@ -35,49 +39,71 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
   const managerRef = useRef<HTMLSelectElement>(null) // 내가 연결하고 싶은 태그를 제네릭으로 전달
   const managerRef2 = useRef<HTMLInputElement>(null) // 내가 연결하고 싶은 태그를 제네릭으로 전달
 
-  const onSubmit = () => {
-    if (isInsertingDesc) {
-      return
+  const titleMessage = useMemo(() => {
+    const title = requirement.title
+    if (title.length === 0) {
+      return "요구사항 기능 이름을 적으세요."
+    }
+    if (title.length > 30) {
+      return "너무 긴 이름입니다."
     }
 
-    if (requirement.title.length === 0) {
-      alert("기능 이름을 적어주세요.")
-      return setTimeout(() => titleRef.current?.focus(), 100)
-    }
+    return null
+  }, [requirement.title])
 
-    if (requirement.status.length === 0) {
-      alert("진행상태를 선택해주세요.")
-      return setTimeout(() => statusRef.current?.showPicker())
-    }
+  useEffect(() => {
+    console.log({ titleMessage })
+  }, [titleMessage])
 
-    if (requirement.manager.length === 0) {
-      if (directInserting) {
-        alert("담당자를 입력해주세요.")
-        return setTimeout(() => managerRef2.current?.focus(), 100)
-      }
+  // const onSubmit = useCallback(() => {
+  //   if (isInsertingDesc) {
+  //     return
+  //   }
 
-      alert("담당자를 선택해주세요.")
-      return setTimeout(() => managerRef.current?.showPicker(), 100)
-    }
+  //   if (titleMessage) {
+  //     alert(titleMessage)
+  //     return setTimeout(() => titleRef.current?.focus(), 100)
+  //   }
 
-    alert(payload ? "요구사항을 수정했습니다." : "요구사항을 추가했습니다.")
+  //   if (requirement.status.length === 0) {
+  //     alert("진행상태를 선택해주세요.")
+  //     return setTimeout(() => statusRef.current?.showPicker())
+  //   }
 
-    onDone(requirement)
+  //   if (requirement.manager.length === 0) {
+  //     if (directInserting) {
+  //       alert("담당자를 입력해주세요.")
+  //       return setTimeout(() => managerRef2.current?.focus(), 100)
+  //     }
 
-    if (!payload) {
-      setRequirement({
-        descs: [],
-        id: v4(),
-        manager: "",
-        status: "",
-        title: "",
-      })
+  //     alert("담당자를 선택해주세요.")
+  //     return setTimeout(() => managerRef.current?.showPicker(), 100)
+  //   }
 
-      setTimeout(() => titleRef.current?.focus(), 100)
-      return
-    }
-    onCancel()
-  }
+  //   alert(payload ? "요구사항을 수정했습니다." : "요구사항을 추가했습니다.")
+
+  //   onDone(requirement)
+
+  //   if (!payload) {
+  //     setRequirement({
+  //       descs: [],
+  //       id: v4(),
+  //       manager: "",
+  //       status: "",
+  //       title: "",
+  //     })
+
+  //     setTimeout(() => titleRef.current?.focus(), 100)
+  //     return
+  //   }
+  //   onCancel()
+  // }, [])
+
+  const [boolean, setBoolean] = useState<boolean>(false)
+  const boolHandler = useCallback(() => setBoolean((prev) => !prev), [])
+  const onSubmit = useCallback(() => {
+    console.log(requirement)
+  }, [requirement])
 
   useEffect(
     () => {
