@@ -17,21 +17,48 @@ const RComContainer = ({ id, title, children }: { id: string; title: string } & 
   )
 }
 
-export interface RComInputProps extends RComProps {
+export interface RComInputProps extends RComProps, React.PropsWithChildren {
   ref: React.Ref<HTMLInputElement>
   onChangeText: (value: string) => void
+  input?: Form.InputProps
+  isShowing?: boolean
 }
 
-export const Input = ({ id, onChangeText, placeholder, ref, title, value }: RComInputProps) => {
+export const Input = ({
+  id,
+  onChangeText,
+  placeholder,
+  ref,
+  title,
+  value,
+  input,
+  children,
+  isShowing,
+}: RComInputProps) => {
   return (
     <RComContainer id={id} title={title}>
-      <Form.Text
-        id={id}
-        ref={ref}
-        value={value}
-        onChange={(e) => onChangeText(e.target.value)}
-        placeholder={placeholder}
-      />
+      {children}
+      {isShowing === undefined ? (
+        <Form.Text
+          {...input}
+          id={id}
+          ref={ref}
+          value={value}
+          onChange={(e) => onChangeText(e.target.value)}
+          placeholder={placeholder}
+        />
+      ) : (
+        isShowing && (
+          <Form.Text
+            {...input}
+            id={id}
+            ref={ref}
+            value={value}
+            onChange={(e) => onChangeText(e.target.value)}
+            placeholder={placeholder}
+          />
+        )
+      )}
     </RComContainer>
   )
 }
@@ -45,7 +72,13 @@ export interface RComSelectProps extends RComProps {
 export const Select = ({ id, onSelectOption, options, placeholder, ref, title, value }: RComSelectProps) => {
   return (
     <RComContainer id={id} title={title}>
-      <select id={id} onChange={(e) => onSelectOption(e.target.value)} value={value} ref={ref}>
+      <select
+        id={id}
+        onChange={(e) => onSelectOption(e.target.value)}
+        value={value}
+        ref={ref}
+        className="rounded outline-none bg-gray-100 focus:bg-gray-50 focus:border focus:border-blue-500 h-10 px-2.5 pl-0"
+      >
         <option>{placeholder}</option>
 
         {options.map((option) => (

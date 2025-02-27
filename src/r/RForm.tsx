@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef, FormEvent } from "react"
+import { useState, useEffect, useRef } from "react"
 import { v4 } from "uuid"
 import { FaRegTrashCan, FaRotate, FaPlus } from "react-icons/fa6"
 import { Button, Container, Form } from "../ui"
+import { RCom } from "./components"
 
 interface Props {
   payload?: Requirement
@@ -87,53 +88,28 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
 
   return (
     <Form.Form className="gap-y-2.5 max-w-225 mx-auto p-5 md:px-0" onSubmit={onSubmit}>
-      <Container.Col>
-        <Form.Label htmlFor="title">기능 이름</Form.Label>
-        <Form.Text
-          ref={titleRef}
-          value={requirement.title}
-          id="title"
-          onChange={(e) => setRequirement((prev) => ({ ...prev, title: e.target.value }))}
-        />
-      </Container.Col>
+      <RCom.Input
+        id="title"
+        title="기능 이름"
+        onChangeText={(title) => setRequirement((prev) => ({ ...prev, title }))}
+        ref={titleRef}
+        value={requirement.title}
+        placeholder="e.g.) 홈페이지 추가 버튼"
+      />
 
       <Container.Col>
-        <Form.Label htmlFor="desc">상세내용</Form.Label>
-
-        <ul className="flex flex-col gap-y-1 px-2">
-          {requirement.descs.map((d, index) => (
-            <li key={index} className="flex">
-              <div className="text-xs bg-gray-50 rounded p-1 text-gray-700 hover:shadow-md flex gap-x-2">
-                {index + 1}. {d}
-                <button
-                  type="button"
-                  className="cursor-pointer hover:text-red-500"
-                  onClick={() => {
-                    const descs = [...requirement.descs]
-
-                    descs.splice(index, 1)
-
-                    setRequirement((prev) => ({ ...prev, descs }))
-                  }}
-                >
-                  <FaRegTrashCan />
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-
-        {isInsertingDesc && (
-          <input
-            type="text"
-            id="desc"
-            value={desc}
-            onChange={(e) => setDesc(e.target.value)}
-            ref={descRef}
-            className={input}
-            onFocus={() => setIsInsertingDesc(true)}
-            onBlur={() => setIsInsertingDesc(false)}
-            onKeyDown={(e) => {
+        <RCom.Input
+          isShowing={isInsertingDesc}
+          id="desc"
+          title="상세내용"
+          onChangeText={setDesc}
+          value={desc}
+          ref={descRef}
+          placeholder="상세 내용 입력..."
+          input={{
+            onFocus: () => setIsInsertingDesc(true),
+            onBlur: () => setIsInsertingDesc(false),
+            onKeyDown: (e) => {
               if (e.key === "Enter") {
                 if (desc.length === 0) {
                   alert("상세 내용을 입력해주세요.")
@@ -150,9 +126,33 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
                 setIsInsertingDesc(false)
                 setTimeout(() => statusRef.current?.showPicker(), 100)
               }
-            }}
-          />
-        )}
+              console.log(e.key)
+            },
+          }}
+        >
+          <ul className="flex flex-col gap-y-1 px-2">
+            {requirement.descs.map((d, index) => (
+              <li key={index} className="flex">
+                <div className="text-xs bg-gray-50 rounded p-1 text-gray-700 hover:shadow-md flex gap-x-2">
+                  {index + 1}. {d}
+                  <button
+                    type="button"
+                    className="cursor-pointer hover:text-red-500"
+                    onClick={() => {
+                      const descs = [...requirement.descs]
+
+                      descs.splice(index, 1)
+
+                      setRequirement((prev) => ({ ...prev, descs }))
+                    }}
+                  >
+                    <FaRegTrashCan />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </RCom.Input>
 
         <Button.Opacity
           onClick={() => {
@@ -166,67 +166,56 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
 
       <Container.Row className="items-end">
         <Container.Row className="flex-2">
-          <Container.Col>
-            <Form.Label htmlFor="status">진행상태</Form.Label>
-            <select
-              ref={statusRef}
-              id="status"
-              value={requirement.status}
-              className={select}
-              onChange={(e) => {
-                setRequirement((prev) => ({ ...prev, status: e.target.value as RequirementStatus }))
-                setTimeout(() => {
-                  if (directInserting) {
-                    return managerRef2.current?.focus()
-                  }
-                  managerRef.current?.showPicker()
-                }, 100)
-              }}
-            >
-              <option>선택</option>
+          <RCom.Select
+            id="status"
+            onSelectOption={(status) => {
+              setRequirement((prev) => ({ ...prev, status: status as RequirementStatus }))
+              setTimeout(() => {
+                if (directInserting) {
+                  return managerRef2.current?.focus()
+                }
+                managerRef.current?.showPicker()
+              }, 100)
+            }}
+            options={statuses}
+            placeholder="선택"
+            ref={statusRef}
+            title="진행 상태"
+            value={requirement.status}
+          />
 
-              {statuses.map((status) => (
-                <option value={status} key={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </Container.Col>
           <Container.Row className="flex-1">
             {!directInserting ? (
-              <Container.Col>
-                <Form.Label htmlFor="manager1">담당자</Form.Label>
-                <select
-                  ref={managerRef}
+              <>
+                <RCom.Select
                   id="manager1"
-                  value={requirement.manager}
-                  className={select}
-                  onChange={(e) => {
-                    const { value } = e.target
+                  onSelectOption={(value) => {
                     if (value === "직접 입력") {
                       setRequirement((prev) => ({ ...prev, manager: "" }))
                       setDirectInserting(true)
                       return setTimeout(() => managerRef2.current?.focus(), 100)
                     }
-                    setRequirement((prev) => ({ ...prev, manager: value as RequirementManager })) //! as 타입 = 어떤 값이 내가 원하는 타입과 일치하지 않더라도 일단 이렇게 이해해줘 라고 부탁하는 것
+                    setRequirement((prev) => ({ ...prev, manager: value as RequirementManager }))
                   }}
-                >
-                  <option>선택</option>
-                  <option value="직접 입력">직접 입력</option>
-
-                  {managers.map((manager) => (
-                    <option key={manager} value={manager}>
-                      {manager}
-                    </option>
-                  ))}
-                </select>
-              </Container.Col>
+                  options={["직접 입력", ...managers]}
+                  placeholder="담당자 선택"
+                  ref={managerRef}
+                  title="담당자"
+                  value={requirement.manager}
+                />
+              </>
             ) : (
               <Container.Row className="items-end">
-                <Container.Col className={"flex-1"}>
-                  <Form.Label htmlFor="manager2">직접 입력</Form.Label>
-                  <Form.Text id="manager2" value={requirement.manager} ref={managerRef2} />
-                </Container.Col>
+                <RCom.Input
+                  id="manager2"
+                  onChangeText={(manager) =>
+                    setRequirement((prev) => ({ ...prev, manager: manager as RequirementManager }))
+                  }
+                  placeholder={managers[0]}
+                  ref={managerRef2}
+                  title="직접 입력"
+                  value={requirement.manager}
+                />
                 <Button.Opacity
                   onClick={() => {
                     setRequirement((prev) => ({ ...prev, manager: "" }))
@@ -258,9 +247,6 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
 }
 
 export default RForm
-
-const input = "rounded outline-none bg-gray-100 focus:bg-gray-50 focus:border focus:border-blue-500 h-10 px-2.5"
-const select = input.concat(" pl-0")
 
 const statuses: RequirementStatus[] = ["계획중", "진행중", "완료"]
 const managers: RequirementManager[] = ["강산", "강찬희", "김영화", "유경환", "허승이"]
