@@ -88,10 +88,10 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
 
   return (
     <form className="flex flex-col gap-y-2.5 max-w-225 mx-auto p-5 md:px-0" onSubmit={onSubmit}>
-      <div className={div}>
-        <label htmlFor="title" className={label}>
+      {/* <Container className="border" id="Hello">
+        <Label htmlFor="title" >
           기능 이름
-        </label>
+        </Label>
         <input
           ref={titleRef}
           type="text"
@@ -100,7 +100,7 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
           className={input}
           onChange={(e) => setRequirement((prev) => ({ ...prev, title: e.target.value }))}
         />
-      </div>
+      </Container> */}
 
       <div className={div}>
         <label htmlFor="desc" className={label}>

@@ -66,3 +66,19 @@
 2. useState로 상태 관리하기
 3. useEffect로 앱 시작시 동작하는 함수 적용하기
 4. useRef 로 사용자 경험 향상
+
+## Todo: Requirement 앱: 리액트 컴포넌트 화하기
+
+2번 이상 반복된 태그를 리액트 컴포넌트로 만들고 props-drilling을 통해 데이터를 전달받도록 설계
+
+1. components/index.ts 에서 모든 컴포넌트들을 내보내기 관리하기
+   예) export _ as Component from './YourComponent'
+   예) export _ from './YourComponent'
+   예) export { default as Component } from './YourComponent'
+
+2. 컴포넌트 만들때 고려할 점
+
+- 필요한 데이터 타입 지정
+- 확장성
+- 재사용성 (반복횟수)
+- 코드 분할
