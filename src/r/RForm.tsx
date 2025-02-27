@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, FormEvent } from "react"
 import { v4 } from "uuid"
 import { FaRegTrashCan, FaRotate, FaPlus } from "react-icons/fa6"
+import { Button, Container, Form } from "../ui"
 
 interface Props {
   payload?: Requirement
@@ -33,9 +34,7 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
   const managerRef = useRef<HTMLSelectElement>(null) // 내가 연결하고 싶은 태그를 제네릭으로 전달
   const managerRef2 = useRef<HTMLInputElement>(null) // 내가 연결하고 싶은 태그를 제네릭으로 전달
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
+  const onSubmit = () => {
     if (isInsertingDesc) {
       return
     }
@@ -87,25 +86,19 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
   )
 
   return (
-    <form className="flex flex-col gap-y-2.5 max-w-225 mx-auto p-5 md:px-0" onSubmit={onSubmit}>
-      {/* <Container className="border" id="Hello">
-        <Label htmlFor="title" >
-          기능 이름
-        </Label>
-        <input
+    <Form.Form className="gap-y-2.5 max-w-225 mx-auto p-5 md:px-0" onSubmit={onSubmit}>
+      <Container.Col>
+        <Form.Label htmlFor="title">기능 이름</Form.Label>
+        <Form.Text
           ref={titleRef}
-          type="text"
           value={requirement.title}
           id="title"
-          className={input}
           onChange={(e) => setRequirement((prev) => ({ ...prev, title: e.target.value }))}
         />
-      </Container> */}
+      </Container.Col>
 
-      <div className={div}>
-        <label htmlFor="desc" className={label}>
-          상세내용
-        </label>
+      <Container.Col>
+        <Form.Label htmlFor="desc">상세내용</Form.Label>
 
         <ul className="flex flex-col gap-y-1 px-2">
           {requirement.descs.map((d, index) => (
@@ -161,24 +154,20 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
           />
         )}
 
-        <button
-          className="w-full rounded bg-gray-50 flex justify-center h-10 items-center hover:opacity-80 active:opacity-50 hover:bg-gray-100 cursor-pointer"
-          type="button"
+        <Button.Opacity
           onClick={() => {
             setIsInsertingDesc(true)
             setTimeout(() => descRef.current?.focus(), 100)
           }}
         >
           <FaPlus />
-        </button>
-      </div>
+        </Button.Opacity>
+      </Container.Col>
 
-      <div className="flex gap-x-2.5 items-end">
-        <div className="flex gap-x-2.5 flex-2">
-          <div className={div}>
-            <label htmlFor="status" className={label}>
-              진행상태
-            </label>
+      <Container.Row className="items-end">
+        <Container.Row className="flex-2">
+          <Container.Col>
+            <Form.Label htmlFor="status">진행상태</Form.Label>
             <select
               ref={statusRef}
               id="status"
@@ -202,13 +191,11 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
                 </option>
               ))}
             </select>
-          </div>
-          <div className="flex-1">
+          </Container.Col>
+          <Container.Row className="flex-1">
             {!directInserting ? (
-              <div className={div}>
-                <label htmlFor="manager1" className={label}>
-                  담당자
-                </label>
+              <Container.Col>
+                <Form.Label htmlFor="manager1">담당자</Form.Label>
                 <select
                   ref={managerRef}
                   id="manager1"
@@ -233,18 +220,14 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
                     </option>
                   ))}
                 </select>
-              </div>
+              </Container.Col>
             ) : (
-              <div className="flex gap-x-2.5 items-end">
-                <div className={div.concat(" flex-1")}>
-                  <label htmlFor="manager2" className={label}>
-                    직접 입력
-                  </label>
-                  <input type="text" id="manager2" value={requirement.manager} className={input} ref={managerRef2} />
-                </div>
-                <button
-                  type="button"
-                  className="h-10 w-10 rounded bg-gray-50 flex items-center justify-center text-gray-500 hover:opacity-80 hover:bg-gray-100 active:opacity-50 cursor-pointer"
+              <Container.Row className="items-end">
+                <Container.Col className={"flex-1"}>
+                  <Form.Label htmlFor="manager2">직접 입력</Form.Label>
+                  <Form.Text id="manager2" value={requirement.manager} ref={managerRef2} />
+                </Container.Col>
+                <Button.Opacity
                   onClick={() => {
                     setRequirement((prev) => ({ ...prev, manager: "" }))
                     setDirectInserting(false)
@@ -252,37 +235,30 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
                   }}
                 >
                   <FaRotate />
-                </button>
-              </div>
+                </Button.Opacity>
+              </Container.Row>
             )}
-          </div>
-        </div>
+          </Container.Row>
+        </Container.Row>
 
-        <div className="flex gap-x-2.5 flex-1">
-          <button className="rounded bg-sky-500 h-10 px-2.5 text-white hover:opacity-80 active:opactiy-50 cursor-pointer flex-3">
+        <Container.Row className="flex-1">
+          <Button.Opacity type="submit" className="bg-sky-500 text-white flex-3">
             {/* 삼항 연산자
                 조건 ? 코드1 : 코드2
                 조건이 참이거나 부합할 때 코드1을 실행
                 조건이 거짓이거나 부합하지 않을 때 코드2를 실행
             */}
             {payload ? "수정" : "추가"}
-          </button>
-          <button
-            type="button"
-            className="rounded bg-gray-50 px-2.5 hover:opacity-80 active:opacity-50 cursor-pointer hover:bg-gray-100"
-          >
-            취소
-          </button>
-        </div>
-      </div>
-    </form>
+          </Button.Opacity>
+          <Button.Opacity onClick={onCancel}>취소</Button.Opacity>
+        </Container.Row>
+      </Container.Row>
+    </Form.Form>
   )
 }
 
 export default RForm
 
-const div = "flex flex-col gap-y-1"
-const label = "text-xs text-gray-500"
 const input = "rounded outline-none bg-gray-100 focus:bg-gray-50 focus:border focus:border-blue-500 h-10 px-2.5"
 const select = input.concat(" pl-0")
 
