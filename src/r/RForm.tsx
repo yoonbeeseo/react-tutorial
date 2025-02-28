@@ -14,15 +14,16 @@ interface Props {
 
 const RForm = ({ onCancel, onDone, payload }: Props) => {
   const initialState = useMemo<Requirement>(() => {
-    return (
-      payload ?? {
-        descs: [],
-        id: v4(),
-        manager: "",
-        status: "",
-        title: "",
-      }
-    )
+    if (payload) {
+      return payload
+    }
+    return {
+      descs: [],
+      id: v4(),
+      manager: "",
+      status: "",
+      title: "",
+    }
   }, [payload])
 
   const [requirement, setRequirement] = useState(initialState)
@@ -40,70 +41,77 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
   const managerRef2 = useRef<HTMLInputElement>(null) // 내가 연결하고 싶은 태그를 제네릭으로 전달
 
   const titleMessage = useMemo(() => {
-    const title = requirement.title
-    if (title.length === 0) {
+    if (requirement.title.length === 0) {
       return "요구사항 기능 이름을 적으세요."
     }
-    if (title.length > 30) {
+    if (requirement.title.length > 30) {
       return "너무 긴 이름입니다."
     }
-
-    return null
+    // return null
   }, [requirement.title])
+
+  const statusMessage = useMemo(() => {
+    if (requirement.status.length === 0) {
+      return "진행상태를 선택해주세요."
+    }
+  }, [requirement.status])
+
+  const managerMessage = useMemo(() => {
+    if (requirement.manager.length === 0) {
+      if (directInserting) {
+        return "담당자를 입력해주세요."
+      }
+
+      return "담당자를 선택해주세요."
+    }
+  }, [requirement.manager])
 
   useEffect(() => {
     console.log({ titleMessage })
   }, [titleMessage])
 
-  // const onSubmit = useCallback(() => {
-  //   if (isInsertingDesc) {
-  //     return
-  //   }
-
-  //   if (titleMessage) {
-  //     alert(titleMessage)
-  //     return setTimeout(() => titleRef.current?.focus(), 100)
-  //   }
-
-  //   if (requirement.status.length === 0) {
-  //     alert("진행상태를 선택해주세요.")
-  //     return setTimeout(() => statusRef.current?.showPicker())
-  //   }
-
-  //   if (requirement.manager.length === 0) {
-  //     if (directInserting) {
-  //       alert("담당자를 입력해주세요.")
-  //       return setTimeout(() => managerRef2.current?.focus(), 100)
-  //     }
-
-  //     alert("담당자를 선택해주세요.")
-  //     return setTimeout(() => managerRef.current?.showPicker(), 100)
-  //   }
-
-  //   alert(payload ? "요구사항을 수정했습니다." : "요구사항을 추가했습니다.")
-
-  //   onDone(requirement)
-
-  //   if (!payload) {
-  //     setRequirement({
-  //       descs: [],
-  //       id: v4(),
-  //       manager: "",
-  //       status: "",
-  //       title: "",
-  //     })
-
-  //     setTimeout(() => titleRef.current?.focus(), 100)
-  //     return
-  //   }
-  //   onCancel()
-  // }, [])
-
-  const [boolean, setBoolean] = useState<boolean>(false)
-  const boolHandler = useCallback(() => setBoolean((prev) => !prev), [])
   const onSubmit = useCallback(() => {
-    console.log(requirement)
-  }, [requirement])
+    if (isInsertingDesc) {
+      return
+    }
+
+    if (titleMessage) {
+      alert(titleMessage)
+      return setTimeout(() => titleRef.current?.showPicker(), 100)
+    }
+
+    if (statusMessage) {
+      alert(statusMessage)
+      return setTimeout(() => {
+        statusRef.current?.showPicker()
+      }, 100)
+    }
+
+    if (managerMessage) {
+      alert(managerMessage)
+      return setTimeout(() => {
+        managerRef.current?.showPicker()
+      }, 100)
+    }
+
+    alert(payload ? "요구사항을 수정했습니다." : "요구사항을 추가했습니다.")
+
+    onDone(requirement)
+
+    if (!payload) {
+      setRequirement({
+        descs: [],
+        id: v4(),
+        manager: "",
+        status: "",
+        title: "",
+      })
+
+      setTimeout(() => titleRef.current?.focus(), 100)
+      return
+    }
+    onCancel()
+  }, [isInsertingDesc, titleMessage, titleRef, statusMessage, statusRef, managerMessage, managerRef])
 
   useEffect(
     () => {
@@ -111,6 +119,10 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
     },
     [] // 빈배열이란 해당 컴포넌트가 최초 렌데링 되는 시점에 딱 한 번 실행할 코드
   )
+
+  useEffect(() => {
+    console.log("submit 함수 재 렌더링 됨")
+  }, [onSubmit])
 
   return (
     <Form.Form className="gap-y-2.5 max-w-225 mx-auto p-5 md:px-0" onSubmit={onSubmit}>
