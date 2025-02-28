@@ -1,8 +1,16 @@
-# React + Vite
+# 리액트에서 전역상태 관리하기
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+페이지 전환할 때 상태전달 불가능하고 자식 컴포넌트에게 props-drilling으로 전달하기가 귀찮아서 씀
 
-Currently, two official plugins are available:
+1. 페이지 전환 왜 함?
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+   웹 개발은 많은 페이지를 지원하기 때문에 전역상태 관리가 필수적임
+
+2. 자식 컴포넌트에게 왜 전달함?
+
+   자식 컴포넌트가 렌더링 될 때 사용할 새로운 값을 전달하기 위해서
+
+   3겹 이상 props-drilling 하게 되면 귀찮음
+
+3. 전역상태 관리 씀
+   위의1, 2번 조건이 만족하지 않으면 안씀
