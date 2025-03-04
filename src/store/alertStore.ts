@@ -21,5 +21,5 @@ export const use = create<Props>()((set) => ({
   message: null,
   closeFn: () => set((prev) => ({ ...prev, isShowing: false })),
   alert: (message: string | null, buttons?: Button[], title?: string) =>
-    set((prev) => ({ ...prev, message, buttons, title })),
+    set((prev) => ({ ...prev, message, buttons, title, isShowing: true })),
 }));
