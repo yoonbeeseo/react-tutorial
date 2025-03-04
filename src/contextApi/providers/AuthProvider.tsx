@@ -2,7 +2,16 @@ import { PropsWithChildren, useCallback, useState, useEffect } from "react";
 import { Auth } from "../contexts";
 
 const AuthProvider = ({ children }: PropsWithChildren) => {
-  const [user, setUser] = useState(Auth.initialState.user);
+  //! process.env.NODE_ENV === 'production' |'development'|
+  const [user, setUser] = useState<Auth.User | null>(
+    process.env.NODE_ENV === "development"
+      ? {
+          email: "test@test.com",
+          uid: "testUid",
+        }
+      : null
+  );
+
   const [initialized, setInitialized] = useState(false);
 
   const login = useCallback((email: string, password: string) => {
