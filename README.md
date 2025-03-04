@@ -1,50 +1,82 @@
-# React + TypeScript + Vite
+# 커스텀 경고 브랜치
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+1. 로그인 로직
 
-Currently, two official plugins are available:
+   Context Api 로구현
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+2. 커스텀 경고창
 
-## Expanding the ESLint configuration
+   zustand로 구현
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+3. 페이지 라우팅
 
-- Configure the top-level `parserOptions` property like this:
+   react-router-dom
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 로그인
+
+```javascript
+interface LoginProps {
+  email: string;
+  password: string;
+}
+
+interface User {
+  email: string;
+  uid: string;
+}
+
+const login = (email: string, password: string) => {
+  const users: User[] = [
+    { email: "test@test.com", password: "123123", uid: "test001" },
+  ];
+  //Todo: 로그인 로직 구현
+};
+
+const logout = () => {
+  //todo: user초기화 끝
+};
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## 페이지 라우팅 (경로)
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+1. 홈화면
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+   로그인
+
+2. 요구사항명세서 앱 페이지
+
+   요구사항명세서 목록이 보이도록
+
+3. 요구사항 명세서 추가 페이지
+
+   요구사항 명세서 추가
+
+4. 요구사항 디테일 페이일
+
+   요구사항 수정 -> 수정 페이지
+
+5. 요구사항 디테일 수정 페이지
+
+## 경고창
+
+1. 알림 제목
+2. 메세지 내용
+3. 버튼 배열
+
+   - 버튼이름
+
+   * 버튼 클릭시 작동할 동작
+
+```javascript
+interface AlertProps {
+  isShowing: boolean
+  title?: string;
+  message: string | null
+  buttons?: AlertButton[]
+}
+
+interface AlertButton {
+  text?: string;
+  onClick?: () => void
+}
 ```
