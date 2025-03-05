@@ -1,11 +1,15 @@
+import { useEffect } from "react";
 import { Alert } from "../store";
 
 const CustomAlert = () => {
   const { closeFn, isShowing, message, buttons, title } = Alert.use();
+  useEffect(() => {
+    console.log(isShowing);
+  }, [isShowing]);
 
   return (
     isShowing && (
-      <div className="fixed w-full h-screen flex justify-center items-center">
+      <div className="fixed w-full h-screen flex justify-center items-center top-0 left-0 z-10">
         <div className="flex gap-x-2.5 border max-w-100 rounded-md border-gray-200 p-2.5 bg-white shadow-md">
           <img
             src="https://cdn.pixabay.com/photo/2018/06/28/12/34/panda-3503779_640.jpg"

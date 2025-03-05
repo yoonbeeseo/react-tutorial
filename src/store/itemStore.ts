@@ -25,10 +25,14 @@ export interface Props {
 export const use = create<Props>((set) => ({
   items: [
     {
-      descs: [],
+      descs: [
+        ";ㅁㄴㅇㄹㅁㅇㄴㄹㅁ",
+        "ㅁㄴㅇㄹㅁㅇㄴㄹ",
+        "ㅁㄴㅇㄹㅁㄴㅇㄹㄴㅇ",
+      ],
       id: "asdfasdfds",
       manager: "강산",
-      status: "계획중",
+      status: "진행중",
       title: "요구사항 명세서 앱 만들기",
     },
   ],
