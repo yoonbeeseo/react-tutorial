@@ -1,50 +1,97 @@
-# React + TypeScript + Vite
+# 쏠로지옥
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+1. 쏠로를 탈출하고 싶은 사람들에게 양질의 매칭 서비스를 지원하는 설문조사 랜딩페이지
 
-Currently, two official plugins are available:
+2. 관리자에게 매칭을 원하는 사람들의 목록을 관리하도록 백 오피스 제공
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+3. 내려받기를 통해 csv 파일로 다운로드 기능 첨부
 
-## Expanding the ESLint configuration
+## 요구사항 명세서
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+1. 백오피스
 
-- Configure the top-level `parserOptions` property like this:
+   - 관리자 로그인이 필요함
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+     아이디, 비밀번호 필수
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+   - 전체 목록, 읽지않은 프로필 탭으로 구분하여서 볼 수 있음
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+   - csv 파일로 전체목록 또는 읽지않은 프로필 또는 읽은 프로필 3가지로 다운로드 받을 수 있음
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+   - 매칭 가능성이 있는 커플에게 상대방의 정보를 담아서 이메일 전송 기능
+
+2. 설문조사 페이지
+
+사용자의 정보를 취합여 제출하도록 함
+
+아이디 + 생성일
+
+1. 이름 문자열
+2. 생년월일 문자열
+3. 연락처 문자열
+4. 이메일 문자열
+5. 주소 문자열
+6. 성별 불리언
+7. 목적 문자열배열
+8. 연애스타일 문자열
+9. 장거리 연애 가능 거리 문자열 | 숫자
+10. 외모
+
+    - 키 숫자
+    - 몸무게 숫자
+    - 체형 문자열
+
+11. 음주량 횟수/주 숫자배열
+12. 흡연 여부 + 흡연량
+13. 운동 여부 + 운동횟수/주
+14. 채식주식 주의 여부 불리언
+
+15. \*\* 관심분야 배열 \*\*
+
+16. 어떤 상대에게 호감을 느끼나요?
+
+- 사랑한다는 말로 표현을 많이 하는 사람
+- 행동으로 표현하는 사람
+- 선물로 표현하는 사람
+- 좋은 시간을 함께 보내는 것
+- 스킨쉽
+
+17. 설문지
+
+    - 질문
+
+    - 대답들
+
+    - 복수선택 가능 여부
+
+### 관리자용 아이디 생성하기
+
+admin@admin.com
+비번 암호화 해서 저장하기
+
+###### 필요 라이브러리
+
+1. zustand: 전역상태관리
+2. contextApi: 전역상태관리 + init 페이지 구현
+3. firebase: 데이터베이스 + 회원관리
+4. tailwindcss: 스타일링 (+ tailwind-merge)
+5. vanilla extract: 애니메이션
+6. rrd: 페이지 라우팅
+7. uuid: 고유 아이디 생성
+8. open-color: 색 팔레트
+9. react-icons: 아이콘
+10. bycrptjs: 암호화
+
+### components 폴더의 존재 이유
+
+반복적으로 사용하는 컴포넌트를 한 번 정의해두고 재 사용하기 위한 폴더
+index.ts를 사용해서 많은 컴포넌트를 취합하여 내보내기 하는 방식을 사용하면 규모가 큰 프로젝트일수록 코드 수를 줄일 수 있음
+
+### Component 만들 때 props 의 타입으로 태그 전체의 내용을 주는 이유
+
+태그의 모든 기능을 사용할 수 있도록 가능성을 열어둠 (확장성)
+내가 정한 것만 받아오도록 하면 확장성을 배제 ( 제한적 )
+
+1. 확장형
+2. 제한형
+3. 복합형 = 제한형 + 확장할 수 있는 통로 마련해줌
