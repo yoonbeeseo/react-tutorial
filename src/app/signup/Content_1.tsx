@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { OnChangeSignup } from "./Content_n";
 import { Animated, Container, Form } from "../../components";
 import { distances, userPurposes } from "../../lib";
@@ -8,11 +8,22 @@ interface Props extends OnChangeSignup {
   purposes: UserPurpose[];
   address: string;
   distance: number;
+
+  distanceRef: React.RefObject<HTMLSelectElement | null>;
+  purposeRef: React.RefObject<HTMLSelectElement | null>;
+  addressRef: React.RefObject<HTMLInputElement | null>;
 }
 
-const Content_1 = ({ address, distance, onChange, purposes }: Props) => {
+const Content_1 = ({
+  address,
+  distance,
+  onChange,
+  purposes,
+  addressRef,
+  distanceRef,
+  purposeRef,
+}: Props) => {
   const [ps, setPs] = useState(purposes);
-  const pRef = useRef<HTMLSelectElement>(null);
 
   useEffect(() => {
     onChange("purposes", ps);
@@ -31,11 +42,13 @@ const Content_1 = ({ address, distance, onChange, purposes }: Props) => {
           id="address"
           placeholder="서울특별시 강남구 00동"
           onChange={(e) => onChange("address", e.target.value)}
+          ref={addressRef}
         />
       </Container.Col>
       <Container.Col className="gap-y-1">
         <Form.Label htmlFor="distance">연애가능거리</Form.Label>
         <Form.Select
+          ref={distanceRef}
           id="distance"
           value={distance}
           onChange={(e) => onChange("distance", Number(e.target.value))}
@@ -53,7 +66,7 @@ const Content_1 = ({ address, distance, onChange, purposes }: Props) => {
       <Container.Col className="gap-y-1">
         <Form.Label htmlFor="purpose">목표</Form.Label>
         <Form.Select
-          ref={pRef}
+          ref={purposeRef}
           id="purpose"
           onChange={(e) => {
             setPs((prev) => {
@@ -66,8 +79,8 @@ const Content_1 = ({ address, distance, onChange, purposes }: Props) => {
               return [up, ...prev];
             });
             setTimeout(() => {
-              if (pRef.current) {
-                pRef.current.value = "선택";
+              if (purposeRef.current) {
+                purposeRef.current.value = "선택";
               }
             }, 300);
           }}

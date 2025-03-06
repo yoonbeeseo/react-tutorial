@@ -28,3 +28,28 @@ export const counts: UserCount[] = [
   "7회",
   "직접입력",
 ];
+
+export const userPoints: UserPoint[] = [
+  "말로 표현하는 사람",
+  "행동으로 표현하는 사람",
+  "선물로 표현하는 사람",
+  "시간을 함께 보내는 사람",
+  "스킨쉽",
+];
+
+export const userInterests: UserInterestType[] = [
+  "음악",
+  "영화 & 예능",
+  "미술 & 그림",
+  "음식 & 요리",
+  "술자리",
+  "여행",
+  "운동 & 건강",
+  "캠핑",
+  "정의구현",
+  "문학",
+  "게임",
+  "명상",
+  "IT기술",
+  "창업",
+];

@@ -8,27 +8,42 @@ interface Props extends OnChangeSignup {
   workouts: UserCount | string;
   drinks: UserCount | string;
   smokes: UserCount | string;
+
+  workoutRef: React.RefObject<HTMLSelectElement | null>;
+  smokeRef: React.RefObject<HTMLSelectElement | null>;
+  drinkRef: React.RefObject<HTMLSelectElement | null>;
 }
 
-const Content_3 = ({ drinks, onChange, smokes, workouts }: Props) => {
+const Content_3 = ({
+  drinks,
+  onChange,
+  smokes,
+  workouts,
+  drinkRef,
+  smokeRef,
+  workoutRef,
+}: Props) => {
   const items: ItemProps[] = [
     {
       id: "workouts",
       onChange: (value) => onChange("workouts", value),
       title: "운동 횟수 / 주",
       value: workouts,
+      ref: workoutRef,
     },
     {
       id: "drinks",
       onChange: (value) => onChange("drinks", value),
       title: "술자리 횟수 / 주",
       value: drinks,
+      ref: drinkRef,
     },
     {
       id: "smokes",
       onChange: (value) => onChange("smokes", value),
       title: "흡연 횟수 / 주",
       value: smokes,
+      ref: smokeRef,
     },
   ];
 
@@ -66,8 +81,9 @@ interface ItemProps {
   value: UserCount | string;
   title: string;
   onChange: (value: string) => void;
+  ref: React.RefObject<HTMLSelectElement | null>;
 }
-const Item = ({ id, onChange, value, title }: ItemProps) => {
+const Item = ({ id, onChange, value, title, ref }: ItemProps) => {
   const [isDirectlyInserting, setIsDirectlyInserting] = useState(false);
 
   return (
@@ -91,6 +107,7 @@ const Item = ({ id, onChange, value, title }: ItemProps) => {
         </Container.Row>
       ) : (
         <Form.Select
+          ref={ref}
           id="workout"
           value={value}
           onChange={(e) => {

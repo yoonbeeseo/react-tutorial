@@ -7,9 +7,20 @@ import { bodyTypes } from "../../lib";
 interface Props extends OnChangeSignup {
   isVegetarian: boolean;
   appearance: UserAppearance;
+
+  heightRef: React.RefObject<HTMLInputElement | null>;
+  weightRef: React.RefObject<HTMLInputElement | null>;
+  bodyRef: React.RefObject<HTMLSelectElement | null>;
 }
 
-const Content_2 = ({ appearance, isVegetarian, onChange }: Props) => {
+const Content_2 = ({
+  appearance,
+  isVegetarian,
+  onChange,
+  bodyRef,
+  heightRef,
+  weightRef,
+}: Props) => {
   const [a, setA] = useState(appearance);
 
   useEffect(() => {
@@ -47,6 +58,7 @@ const Content_2 = ({ appearance, isVegetarian, onChange }: Props) => {
         <Form.Label htmlFor="height">키</Form.Label>
         <Container.Row className="gap-x-2.5">
           <Form.Input
+            ref={heightRef}
             id="height"
             value={a.height.value === 0 ? "" : a.height.value}
             placeholder={`키를 ${a.height.isCM ? "cm" : "ft"}로 입력해주세요.`}
@@ -78,6 +90,7 @@ const Content_2 = ({ appearance, isVegetarian, onChange }: Props) => {
         <Form.Label htmlFor="weight">몸무게</Form.Label>
         <Container.Row className="gap-x-2.5">
           <Form.Input
+            ref={weightRef}
             min={0}
             id="weight"
             value={a.weight.value === 0 ? "" : a.weight.value}
@@ -118,6 +131,7 @@ const Content_2 = ({ appearance, isVegetarian, onChange }: Props) => {
               bodyType: e.target.value as UserBodyType,
             }))
           }
+          ref={bodyRef}
         >
           <option>선택</option>
 

@@ -10,9 +10,25 @@ interface Props extends OnChangeSignup {
   con: string;
 
   onChangePw: (target: "pw" | "con", value: string) => void;
+
+  genderRef: React.RefObject<HTMLSelectElement | null>;
+  emailRef: React.RefObject<HTMLInputElement | null>;
+  pwRef: React.RefObject<HTMLInputElement | null>;
+  conRef: React.RefObject<HTMLInputElement | null>;
 }
 
-const Content_0 = ({ email, gender, onChange, con, onChangePw, pw }: Props) => {
+const Content_0 = ({
+  email,
+  gender,
+  onChange,
+  con,
+  onChangePw,
+  pw,
+  conRef,
+  emailRef,
+  genderRef,
+  pwRef,
+}: Props) => {
   return (
     <Animated.Emerge className="gap-y-2.5">
       <Container.Row>
@@ -22,6 +38,7 @@ const Content_0 = ({ email, gender, onChange, con, onChangePw, pw }: Props) => {
             id="gender"
             value={gender}
             onChange={(e) => onChange("gender", e.target.value)}
+            ref={genderRef}
           >
             <option>선택</option>
             {genders.map((g) => (
@@ -36,6 +53,7 @@ const Content_0 = ({ email, gender, onChange, con, onChangePw, pw }: Props) => {
       <Container.Col className="gap-y-1">
         <Form.Label htmlFor="email">이메일</Form.Label>
         <Form.Input
+          ref={emailRef}
           id="email"
           value={email}
           onChange={(e) => onChange("email", e.target.value)}
@@ -51,6 +69,7 @@ const Content_0 = ({ email, gender, onChange, con, onChangePw, pw }: Props) => {
           onChange={(e) => onChangePw("pw", e.target.value)}
           placeholder="* * * * * * * *"
           type="password"
+          ref={pwRef}
         />
       </Container.Col>
 
@@ -62,6 +81,7 @@ const Content_0 = ({ email, gender, onChange, con, onChangePw, pw }: Props) => {
           onChange={(e) => onChangePw("con", e.target.value)}
           placeholder="* * * * * * * *"
           type="password"
+          ref={conRef}
         />
       </Container.Col>
     </Animated.Emerge>
