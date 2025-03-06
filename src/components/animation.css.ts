@@ -12,6 +12,8 @@ const fromTop = keyframes({
 });
 const styles = style({
   animation: `${fromTop} 1s ease`,
+  display: "flex",
+  flexDirection: "column",
 });
 
 export default styles;

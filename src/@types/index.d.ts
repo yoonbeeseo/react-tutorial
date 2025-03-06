@@ -8,22 +8,32 @@ interface User {
   id: string;
   createdAt: number;
 
+  //? NO CONTENT
   name: string;
   dob: string;
+  mobile: string;
+
+  //? 0
+  gender: UserGender | "";
   email: string;
+
+  //? 1
   address: string;
-  gender: UserGender;
   purposes: UserPurpose[];
   distance: number;
 
+  //? 2
+  isVegetarian: boolean;
   appearance: UserAppearance;
+
+  //? 3
   drinks: UserCount | string;
   smokes: UserCount | string;
   workouts: UserCount | string;
 
-  isVegetarian: boolean;
-  interests: UserInterest[];
+  //? 4
   points: UserPoint[];
+  interests: UserInterest[];
 }
 
 type UserGender = "남" | "녀" | "안알려줌";
@@ -69,7 +79,7 @@ type UserInterestType =
 interface UserAppearance {
   height: UserHeight;
   weight: UserWeight;
-  bodyType: UserBodyType;
+  bodyType: UserBodyType | "";
 }
 
 interface UserHeight {
