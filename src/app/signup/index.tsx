@@ -8,6 +8,7 @@ import Content_2 from "./Content_2";
 import Content_3 from "./Content_3";
 import Content_4 from "./Content_4";
 import { stringValidator } from "../../lib";
+import { Alert } from "../../contexts";
 
 const Signup = () => {
   const content = useSearchParams()[0].get("content");
@@ -262,17 +263,20 @@ const Signup = () => {
     [name]
   );
 
+  const { alert } = Alert.use();
   const onSubmit = useCallback(() => {
     const next = (number: number) => navi(`/signup?content=${number}`);
     if (!content) {
       if (nameMessage) {
-        alert(nameMessage);
-        return focus("name");
+        return alert(nameMessage, [
+          { text: "hello" },
+          { onClick: () => focus("name") },
+        ]);
       }
       return next(0);
     }
     next(Number(content) + 1);
-  }, [navi, content, focus, nameMessage]);
+  }, [navi, content, focus, nameMessage, alert]);
 
   return (
     <Form.Container className="m-5 max-w-100 mx-auto" onSubmit={onSubmit}>
