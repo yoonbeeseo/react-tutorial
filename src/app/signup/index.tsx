@@ -7,7 +7,14 @@ import Content_1 from "./Content_1";
 import Content_2 from "./Content_2";
 import Content_3 from "./Content_3";
 import Content_4 from "./Content_4";
-import { stringValidator } from "../../lib";
+import {
+  arrayLengthValidator,
+  dobValidator,
+  emailValidator,
+  heightWeightValidator,
+  mobileValidator,
+  stringValidator,
+} from "../../lib";
 import { Alert } from "../../contexts";
 
 const Signup = () => {
@@ -204,17 +211,17 @@ const Signup = () => {
           case "pw":
             return pwRef.current?.focus();
           case "distance":
-            return distanceRef.current?.focus();
+            return distanceRef.current?.showPicker();
           case "dob":
             return dobRef.current?.focus();
           case "drinks":
-            return drinkRef.current?.focus();
+            return drinkRef.current?.showPicker();
           case "smokes":
-            return smokeRef.current?.focus();
+            return smokeRef.current?.showPicker();
           case "workouts":
-            return workoutRef.current?.focus();
+            return workoutRef.current?.showPicker();
           case "gender":
-            return genderRef.current?.focus();
+            return genderRef.current?.showPicker();
           case "email":
             return emailRef.current?.focus();
           case "mobile":
@@ -222,17 +229,17 @@ const Signup = () => {
           case "name":
             return nameRef.current?.focus();
           case "points":
-            return pointRef.current?.focus();
+            return pointRef.current?.showPicker();
           case "purposes":
-            return purposeRef.current?.focus();
+            return purposeRef.current?.showPicker();
           case "interests":
-            return interestRef.current?.focus();
+            return interestRef.current?.showPicker();
           case "weight":
             return weightRef.current?.focus();
           case "height":
             return heightRef.current?.focus();
           case "bodyType":
-            return bodyRef.current?.focus();
+            return bodyRef.current?.showPicker();
         }
       }, 100);
     },
@@ -262,21 +269,231 @@ const Signup = () => {
     () => stringValidator(name, "이름을 입력해주세요."),
     [name]
   );
+  const dobMessage = useMemo(() => {
+    if (stringValidator(dob)) {
+      return "생년월일을 입력해주세요.";
+    }
+
+    let split: string[] = [];
+    if (dob.includes(".") || dob.includes("-") || dob.includes("/")) {
+      if (dob.includes(".")) {
+        split = dob.split(".");
+      } else if (dob.includes("-")) {
+        split = dob.split("-");
+      } else if (dob.includes("/")) {
+        split = dob.split("/");
+      }
+    } else {
+      if (dob.length !== 8) {
+        return "생년월일을 확인해주세요.";
+      }
+      const year = `${dob[0]}${dob[1]}${dob[2]}${dob[3]}`;
+      const month = `${dob[4]}${dob[5]}`;
+      const date = `${dob[6]}${dob[7]}`;
+
+      split = [year, month, date];
+    }
+
+    if (dobValidator(split)) {
+      return dobValidator(split);
+    }
+    return null;
+  }, [dob]);
+
+  const mobileMessage = useMemo(() => mobileValidator(mobile), [mobile]);
+
+  const genderMessage = useMemo(
+    () => stringValidator(gender, "성별을 선택해주세요."),
+    [gender]
+  );
+
+  const emailMessage = useMemo(() => emailValidator(email), [email]);
+
+  const pwMessage = useMemo(
+    () => stringValidator(pws.pw, "비밀번호를 확인해주세요."),
+    [pws.pw]
+  );
+
+  const conMessage = useMemo(() => {
+    if (stringValidator(pws.con)) {
+      return stringValidator(pws.con, "비밀번호를 한 번 더 확인해주세요.");
+    }
+    if (pwMessage) {
+      return pwMessage;
+    }
+    if (pws.pw !== pws.con) {
+      return "비밀번호가 일치하지 않습니다. 다시 한 번 확인해주세요.";
+    }
+  }, [pws, pwMessage]);
+
+  const addressMessage = useMemo(
+    () => stringValidator(address, "주소를 입력해주세요."),
+    [address]
+  );
+  const distanceMessage = useMemo(() => {
+    if (distance === 0) {
+      return "연애 가능 거리를 입력해주세요.";
+    }
+    return null;
+  }, [distance]);
+  const purposeMessage = useMemo(
+    () =>
+      arrayLengthValidator(
+        purposes,
+        "목표를 선택해주세요. 다중 선택 가능합니다."
+      ),
+    [purposes]
+  );
+
+  const heightMessage = useMemo(
+    () => heightWeightValidator(appearance.height.value, "키를 확인해주세요."),
+    [appearance.height.value]
+  );
+  const weightMessage = useMemo(
+    () =>
+      heightWeightValidator(appearance.weight.value, "몸무게를 확인해주세요."),
+    [appearance.weight.value]
+  );
+  const bodyTypeMessage = useMemo(
+    () => stringValidator(appearance.bodyType, "체형을 선택해주세요."),
+    [appearance.bodyType]
+  );
+
+  const workoutMessage = useMemo(
+    () => stringValidator(workouts, "1주일에 몇 번 운동하시나요?"),
+    [workouts]
+  );
+  const drinkMessage = useMemo(
+    () => stringValidator(drinks, "1주일에 몇 번 술자리를 가지시나요?"),
+    [drinks]
+  );
+  const smokeMessage = useMemo(
+    () => stringValidator(smokes, "1주일에 몇 번 흡연하시나요?"),
+    [smokes]
+  );
+
+  const interestMessage = useMemo(
+    () =>
+      arrayLengthValidator(
+        interests,
+        "관심사를 선택해주세요. 중복 선택 가능합니다."
+      ),
+    [interests]
+  );
+  const pointMessage = useMemo(
+    () =>
+      arrayLengthValidator(
+        points,
+        "호감 포인트를 선택해주세요. 중복 선택 가능합니다."
+      ),
+    [points]
+  );
 
   const { alert } = Alert.use();
   const onSubmit = useCallback(() => {
-    const next = (number: number) => navi(`/signup?content=${number}`);
+    const next = () => navi(`/signup?content=${Number(content) + 1}`);
+
     if (!content) {
       if (nameMessage) {
-        return alert(nameMessage, [
-          { text: "hello" },
-          { onClick: () => focus("name") },
-        ]);
+        return alert(nameMessage, [{ onClick: () => focus("name") }]);
       }
-      return next(0);
+      if (dobMessage) {
+        return alert(dobMessage, [{ onClick: () => focus("dob") }]);
+      }
+      if (mobileMessage) {
+        return alert(mobileMessage, [{ onClick: () => focus("mobile") }]);
+      }
+      return navi(`/signup?content=0`);
     }
-    next(Number(content) + 1);
-  }, [navi, content, focus, nameMessage, alert]);
+    switch (content) {
+      case "0":
+        if (genderMessage) {
+          return alert(genderMessage, [{ onClick: () => focus("gender") }]);
+        }
+        if (emailMessage) {
+          return alert(emailMessage, [{ onClick: () => focus("email") }]);
+        }
+
+        if (pwMessage) {
+          return alert(pwMessage, [{ onClick: () => focus("pw") }]);
+        }
+        if (conMessage) {
+          return alert(conMessage, [{ onClick: () => focus("con") }]);
+        }
+        return next();
+
+      case "1":
+        if (addressMessage) {
+          return alert(addressMessage, [{ onClick: () => focus("address") }]);
+        }
+        if (distanceMessage) {
+          return alert(distanceMessage, [{ onClick: () => focus("distance") }]);
+        }
+        if (purposeMessage) {
+          return alert(purposeMessage, [{ onClick: () => focus("purposes") }]);
+        }
+        return next();
+
+      case "2":
+        if (heightMessage) {
+          return alert(heightMessage, [{ onClick: () => focus("height") }]);
+        }
+        if (weightMessage) {
+          return alert(weightMessage, [{ onClick: () => focus("weight") }]);
+        }
+        if (bodyTypeMessage) {
+          return alert(bodyTypeMessage, [{ onClick: () => focus("bodyType") }]);
+        }
+        return next();
+      case "3":
+        if (workoutMessage) {
+          return alert(workoutMessage, [{ onClick: () => focus("workouts") }]);
+        }
+        if (drinkMessage) {
+          return alert(drinkMessage, [{ onClick: () => focus("drinks") }]);
+        }
+        if (smokeMessage) {
+          return alert(smokeMessage, [{ onClick: () => focus("smokes") }]);
+        }
+        return next();
+
+      case "4":
+        if (interestMessage) {
+          return alert(interestMessage, [
+            { onClick: () => focus("interests") },
+          ]);
+        }
+        if (pointMessage) {
+          return alert(pointMessage, [{ onClick: () => focus("points") }]);
+        }
+
+        return console.log(props);
+    }
+  }, [
+    navi,
+    content,
+    focus,
+    nameMessage,
+    alert,
+    dobMessage,
+    mobileMessage,
+    genderMessage,
+    emailMessage,
+    pwMessage,
+    conMessage,
+    addressMessage,
+    distanceMessage,
+    purposeMessage,
+    heightMessage,
+    weightMessage,
+    bodyTypeMessage,
+    workoutMessage,
+    drinkMessage,
+    smokeMessage,
+    interestMessage,
+    pointMessage,
+    props,
+  ]);
 
   return (
     <Form.Container className="m-5 max-w-100 mx-auto" onSubmit={onSubmit}>

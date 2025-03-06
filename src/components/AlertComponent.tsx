@@ -31,7 +31,10 @@ const AlertComponent = () => {
     state && (
       <Container.Row className="fixed top-0 left-0 z-10 w-full h-screen justify-center items-center">
         <Animated.Emerge className="border p-2.5 border-gray-200 rounded-xl relative z-1 min-w-50 max-w-75 overflow-hidden bg-white">
-          <Button.Opacity className="absolute top-0 right-0 h-8 w-8 bg-white">
+          <Button.Opacity
+            className="absolute top-0 right-0 h-8 w-8 bg-white"
+            onClick={closeFn}
+          >
             <AiOutlineClose />
           </Button.Opacity>
           <Container.Col>
@@ -62,6 +65,10 @@ const AlertComponent = () => {
             </Container.Row>
           </Container.Col>
         </Animated.Emerge>
+        <span
+          onClick={closeFn}
+          className="absolute w-full h-full top-0 left-0"
+        />
       </Container.Row>
     )
   );
