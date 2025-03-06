@@ -7,6 +7,7 @@ import Content_1 from "./Content_1";
 import Content_2 from "./Content_2";
 import Content_3 from "./Content_3";
 import Content_4 from "./Content_4";
+import { stringValidator } from "../../lib";
 
 const Signup = () => {
   const content = useSearchParams()[0].get("content");
@@ -191,25 +192,87 @@ const Signup = () => {
     [interests, points, onChange, interestRef, pointRef]
   );
 
+  const focus = useCallback(
+    (target: keyof User | "pw" | "con" | keyof UserAppearance) => {
+      setTimeout(() => {
+        switch (target) {
+          case "address":
+            return addressRef.current?.focus();
+          case "con":
+            return conRef.current?.focus();
+          case "pw":
+            return pwRef.current?.focus();
+          case "distance":
+            return distanceRef.current?.focus();
+          case "dob":
+            return dobRef.current?.focus();
+          case "drinks":
+            return drinkRef.current?.focus();
+          case "smokes":
+            return smokeRef.current?.focus();
+          case "workouts":
+            return workoutRef.current?.focus();
+          case "gender":
+            return genderRef.current?.focus();
+          case "email":
+            return emailRef.current?.focus();
+          case "mobile":
+            return mobileRef.current?.focus();
+          case "name":
+            return nameRef.current?.focus();
+          case "points":
+            return pointRef.current?.focus();
+          case "purposes":
+            return purposeRef.current?.focus();
+          case "interests":
+            return interestRef.current?.focus();
+          case "weight":
+            return weightRef.current?.focus();
+          case "height":
+            return heightRef.current?.focus();
+          case "bodyType":
+            return bodyRef.current?.focus();
+        }
+      }, 100);
+    },
+    [
+      interestRef,
+      pointRef,
+      workoutRef,
+      drinkRef,
+      smokeRef,
+      heightRef,
+      weightRef,
+      bodyRef,
+      nameRef,
+      dobRef,
+      mobileRef,
+      genderRef,
+      emailRef,
+      pwRef,
+      conRef,
+      addressRef,
+      distanceRef,
+      purposeRef,
+    ]
+  );
+
+  const nameMessage = useMemo(
+    () => stringValidator(name, "이름을 입력해주세요."),
+    [name]
+  );
+
   const onSubmit = useCallback(() => {
     const next = (number: number) => navi(`/signup?content=${number}`);
     if (!content) {
+      if (nameMessage) {
+        alert(nameMessage);
+        return focus("name");
+      }
       return next(0);
     }
-    // switch (Number(content)) {
-    //   case 0:
-    //     return console.log("case 0 logic");
-    //   // case 0:
-    //   //   return console.log("case 0 logic");
-    //   // case 0:
-    //   //   return console.log("case 0 logic");
-    //   // case 0:
-    //   //   return console.log("case 0 logic");
-    //   // case 0:
-    //   //   return console.log("case 0 logic");
-    // }
     next(Number(content) + 1);
-  }, [navi, content]);
+  }, [navi, content, focus, nameMessage]);
 
   return (
     <Form.Container className="m-5 max-w-100 mx-auto" onSubmit={onSubmit}>
