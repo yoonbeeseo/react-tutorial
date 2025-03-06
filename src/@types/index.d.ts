@@ -27,13 +27,13 @@ interface User {
   appearance: UserAppearance;
 
   //? 3
+  workouts: UserCount | string;
   drinks: UserCount | string;
   smokes: UserCount | string;
-  workouts: UserCount | string;
 
   //? 4
   points: UserPoint[];
-  interests: UserInterest[];
+  interests: UserInterestType[];
 }
 
 type UserGender = "남" | "녀" | "안알려줌";

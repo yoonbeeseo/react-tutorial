@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { OnChangeSignup } from "./Content_n";
 import { Animated, Container, Form } from "../../components";
 import { distances, userPurposes } from "../../lib";
+import { AiOutlineClose } from "react-icons/ai";
 
 interface Props extends OnChangeSignup {
   purposes: UserPurpose[];
@@ -11,6 +12,15 @@ interface Props extends OnChangeSignup {
 
 const Content_1 = ({ address, distance, onChange, purposes }: Props) => {
   const [ps, setPs] = useState(purposes);
+  const pRef = useRef<HTMLSelectElement>(null);
+
+  useEffect(() => {
+    onChange("purposes", ps);
+
+    return () => {
+      onChange("purposes", ps);
+    };
+  }, [ps, onChange]);
 
   return (
     <Animated.Emerge className="gap-y-2.5">
@@ -43,8 +53,9 @@ const Content_1 = ({ address, distance, onChange, purposes }: Props) => {
       <Container.Col className="gap-y-1">
         <Form.Label htmlFor="purpose">목표</Form.Label>
         <Form.Select
+          ref={pRef}
           id="purpose"
-          onChange={(e) =>
+          onChange={(e) => {
             setPs((prev) => {
               const up = e.target.value as UserPurpose;
 
@@ -53,8 +64,13 @@ const Content_1 = ({ address, distance, onChange, purposes }: Props) => {
                 return prev.filter((item) => item !== up);
               }
               return [up, ...prev];
-            })
-          }
+            });
+            setTimeout(() => {
+              if (pRef.current) {
+                pRef.current.value = "선택";
+              }
+            }, 300);
+          }}
         >
           <option>선택</option>
           {userPurposes.map((up) => (
@@ -63,9 +79,22 @@ const Content_1 = ({ address, distance, onChange, purposes }: Props) => {
             </option>
           ))}
         </Form.Select>
-        <ul className="border">
+        <ul className="flex gap-y-1 flex-wrap gap-x-1">
           {ps?.map((p) => (
-            <li key={p}>{p}</li>
+            <li key={p} className="flex">
+              <Container.Row className="p-1 rounded bg-gray-50 gap-x-1">
+                {p}
+                <button
+                  type="button"
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setPs((prev) => prev.filter((item) => item !== p))
+                  }
+                >
+                  <AiOutlineClose />
+                </button>
+              </Container.Row>
+            </li>
           ))}
         </ul>
       </Container.Col>

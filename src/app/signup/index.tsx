@@ -122,9 +122,28 @@ const Signup = () => {
               purposes={purposes}
             />
           ),
-          2: <Content_2 />,
-          3: <Content_3 />,
-          4: <Content_4 />,
+          2: (
+            <Content_2
+              appearance={appearance}
+              isVegetarian={isVegetarian}
+              onChange={onChange}
+            />
+          ),
+          3: (
+            <Content_3
+              drinks={drinks}
+              onChange={onChange}
+              smokes={smokes}
+              workouts={workouts}
+            />
+          ),
+          4: (
+            <Content_4
+              interests={interests}
+              onChange={onChange}
+              points={points}
+            />
+          ),
         }[content]
       ) : (
         <Content_n
@@ -135,7 +154,7 @@ const Signup = () => {
           onChange={onChange}
         />
       )}
-      <Button.Opacity className="bg-pink-400 text-white mt-2.5">
+      <Button.Opacity type="submit" className="bg-pink-400 text-white mt-2.5">
         다음
       </Button.Opacity>
     </Form.Container>
