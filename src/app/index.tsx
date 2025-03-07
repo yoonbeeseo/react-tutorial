@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Button, Container, Typo } from "../components";
-import { dbSerivce } from "../lib";
+import { dbService } from "../lib";
 
 const Home = () => {
   const [samples, setSamples] = useState<{ text: string; id: string }[]>([]);
 
   useEffect(() => {
-    const subscribe = dbSerivce.collection("sample").onSnapshot((snap) => {
+    const subscribe = dbService.collection("sample").onSnapshot((snap) => {
       const data = snap.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
 
       setSamples(data as any[]);
@@ -22,7 +22,7 @@ const Home = () => {
   //! database 지역, 날씨, 기기, 인터넷 속도 등에 영향 받음
   //? async await
   const onDelete = async (id: string) => {
-    const ref = dbSerivce.collection("sample").doc(id);
+    const ref = dbService.collection("sample").doc(id);
     //! trycatch 로 감싸서 에러핸들링 하기
     try {
       await ref.delete();
@@ -34,7 +34,7 @@ const Home = () => {
 
   const onAdd = async (newText: string) => {
     try {
-      const ref = dbSerivce.collection("sample");
+      const ref = dbService.collection("sample");
 
       await ref.add({ text: newText });
 
@@ -47,7 +47,7 @@ const Home = () => {
 
   const onEdit = async (id: string) => {
     try {
-      const ref = dbSerivce.collection("sample");
+      const ref = dbService.collection("sample");
 
       await ref.doc(id).update({ text: "리액트 배우기" });
 

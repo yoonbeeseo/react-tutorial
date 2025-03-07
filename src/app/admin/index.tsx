@@ -1,25 +1,11 @@
-import { useState, useRef, useCallback, useMemo, useEffect } from "react";
-import { Form, Container, Button } from "../../components";
-import { emailValidator, authService, dbSerivce } from "../../lib";
-import { Alert } from "../../contexts";
+import { useState, useRef, useCallback, useMemo } from "react";
+import { Form, Container, Button, Typo } from "../../components";
+import { emailValidator, authService } from "../../lib";
+import { Alert, Auth } from "../../contexts";
+import AdminPanel from "./AdminPanel";
 
 const AdminPage = () => {
-  const [isInitialAdmin, setIsInitialAdmin] = useState(false);
-
-  useEffect(() => {
-    const subAdmin = dbSerivce.collection("admin").onSnapshot((snap) => {
-      const data = snap.docs.map((doc) => ({ ...(doc.data() as any) }));
-
-      if (data.length === 0) {
-        setIsInitialAdmin(true);
-      } else {
-        setIsInitialAdmin(false);
-      }
-    });
-
-    subAdmin;
-    return subAdmin;
-  }, []);
+  const { isInitialAdmin, admin } = Auth.use();
 
   interface AdminProps {
     email: string;
@@ -104,37 +90,41 @@ const AdminPage = () => {
 
   return (
     <Container.Row>
-      <Form.Container
-        className="w-full max-w-75 p-5 mx-auto"
-        onSubmit={onSubmit}
-      >
-        <Container.Col className="gap-y-1">
-          <Form.Label htmlFor="email">이메일</Form.Label>
-          <Form.Input
-            id="email"
-            type="email"
-            value={props.email}
-            onChange={(e) => onChangeProps("email", e.target.value)}
-            placeholder="Admin@admin.com"
-          />
-        </Container.Col>
-        <Container.Col className="gap-y-1">
-          <Form.Label htmlFor="password">비밀번호</Form.Label>
-          <Form.Input
-            id="password"
-            type="password"
-            value={props.password}
-            onChange={(e) => onChangeProps("password", e.target.value)}
-            placeholder="Enter Admin Password"
-          />
-        </Container.Col>
-        {isInitialAdmin && (
+      {!admin ? (
+        <Form.Container
+          className="w-full max-w-75 p-5 mx-auto"
+          onSubmit={onSubmit}
+        >
+          <Container.Col className="gap-y-1">
+            <Form.Label htmlFor="email">이메일</Form.Label>
+            <Form.Input
+              id="email"
+              type="email"
+              value={props.email}
+              onChange={(e) => onChangeProps("email", e.target.value)}
+              placeholder="Admin@admin.com"
+            />
+          </Container.Col>
+          <Container.Col className="gap-y-1">
+            <Form.Label htmlFor="password">비밀번호</Form.Label>
+            <Form.Input
+              id="password"
+              type="password"
+              value={props.password}
+              onChange={(e) => onChangeProps("password", e.target.value)}
+              placeholder="Enter Admin Password"
+            />
+          </Container.Col>
           <Button.Opacity className="bg-gray-800 text-white" type="submit">
             관리자 계정 로그인
           </Button.Opacity>
-        )}
-        <Button.Link href="create">최초 관리자 계정 생성</Button.Link>
-      </Form.Container>
+          {isInitialAdmin && (
+            <Button.Link href="create">최초 관리자 계정 생성</Button.Link>
+          )}
+        </Form.Container>
+      ) : (
+        <AdminPanel />
+      )}
     </Container.Row>
   );
 };

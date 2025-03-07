@@ -5,8 +5,10 @@ import CRUD from "./app/crud/index";
 import { AlertComponent } from "./components";
 import AdminPage from "./app/admin/index";
 import CreateAdminPage from "./app/admin/create/index";
+import { Auth } from "./contexts";
 
 const AppRouter = () => {
+  const { isInitialAdmin } = Auth.use();
   return (
     <>
       <AlertComponent />
@@ -18,7 +20,9 @@ const AppRouter = () => {
 
           <Route path="admin">
             <Route index Component={AdminPage} />
-            <Route path="create" Component={CreateAdminPage} />
+            {isInitialAdmin && (
+              <Route path="create" Component={CreateAdminPage} />
+            )}
           </Route>
         </Routes>
       </BrowserRouter>

@@ -1,6 +1,6 @@
 import { useState, useEffect, PropsWithChildren } from "react";
 import { Auth } from "../hooks";
-import { dbSerivce, authService } from "../../lib";
+import { dbService, authService } from "../../lib";
 
 const AuthProvider = ({ children }: PropsWithChildren) => {
   const [init, setInit] = useState(false);
@@ -11,7 +11,7 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
   const [admin, setAdmin] = useState(Auth.initialState.admin);
 
   useEffect(() => {
-    const subAdmin = dbSerivce.collection("admin").onSnapshot((snap) => {
+    const subAdmin = dbService.collection("admin").onSnapshot((snap) => {
       const data = snap.docs.map((doc) => ({ ...(doc.data() as any) }));
 
       if (data.length === 0) {
@@ -28,9 +28,15 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   useEffect(() => {
-    const subAuth = authService.onAuthStateChanged((fbUser) => {
+    const subAuth = authService.onAuthStateChanged(async (fbUser) => {
       if (fbUser) {
         console.log("user logged in", fbUser);
+        if (fbUser.uid === import.meta.env.VITE_ADMIN_UID) {
+          const ref = dbService.collection("admin").doc(fbUser.uid);
+          const snap = await ref.get();
+          const data = snap.data() as Auth.Admin;
+          setAdmin(data);
+        }
       } else {
         console.log("no user logged in");
         setUser(null);
@@ -42,6 +48,10 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
 
     return subAuth;
   }, []);
+
+  useEffect(() => {
+    console.log({ admin });
+  }, [admin]);
 
   return (
     <Auth.context.Provider
