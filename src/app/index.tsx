@@ -1,6 +1,22 @@
+import { useEffect } from "react";
 import { Button, Container, Typo } from "../components";
+import { dbSerivce } from "../lib";
 
 const Home = () => {
+  useEffect(() => {
+    const subscribe = dbSerivce.collection("sample").onSnapshot((snap) => {
+      const data = snap.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+
+      console.log(data);
+    });
+
+    subscribe;
+
+    return () => {
+      subscribe;
+    };
+  }, []);
+
   return (
     <Container.Row className="w-full h-screen justify-center items-center">
       <Container.Col className="gap-y-5 max-w-90 p-5">
