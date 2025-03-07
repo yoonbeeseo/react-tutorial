@@ -93,6 +93,9 @@ export const mobileValidator = (mobile: string): Validator => {
 };
 
 export const emailValidator = (email: string): Validator => {
+  if (email.length === 0) {
+    return "이메일을 입력해주세요.";
+  }
   const regex = /\S+@\S+\.\S+/;
   if (!regex.test(email)) {
     return "이메일을 확인해주세요.";
