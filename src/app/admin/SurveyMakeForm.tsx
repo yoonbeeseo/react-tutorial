@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useState, useCallback, useRef, useMemo } from "react";
 import { Container, Form, Button } from "../../components";
 import { stringValidator } from "../../lib";
 import { Alert } from "../../contexts";
@@ -8,7 +8,7 @@ interface Props {
     newSurvey: Survey
   ) => Promise<{ success: boolean; message?: string }>;
 
-  onUpdateSurvey: (
+  onUpdateSurvey?: (
     updatedSurvey: Survey
   ) => Promise<{ success: boolean; message?: string }>;
 
@@ -91,19 +91,60 @@ const SurveyMakeForm = ({
       return alert(oMessage, [{ onClick: () => focus("options") }]);
     }
 
+    const fn = async () => {
+      try {
+        const { success, message } =
+          payload && onUpdateSurvey
+            ? await onUpdateSurvey(survey)
+            : await onAddSurvey(survey);
+
+        if (!success) {
+          return alert(message!);
+        }
+
+        alert(payload ? "수정했습니다." : "추가했습니다.");
+        if (!payload) {
+          setSurvey(initialState);
+        }
+        closeFn();
+      } catch (error: any) {
+        return alert(error.message);
+      }
+    };
+
     if (!survey.isMultiple) {
       alert("정답을 복수 선택할 수 없는게 맞습니까?", [
-        { text: "복수선택안함", onClick: () => console.log("선택안함") },
         {
-          text: "복수선택하기",
+          text: "선택안함",
+          onClick: () => {
+            fn();
+          },
+        },
+        {
+          text: "복수선택",
           onClick: () => {
             onChange("isMultiple", true);
-            console.log("나머지 코드 실행 ㄱㄱ");
+            fn();
           },
         },
       ]);
+    } else {
+      fn();
     }
-  }, [focus, qMessage, oMessage, alert, survey, onChange, isInsertingOption]);
+  }, [
+    focus,
+    qMessage,
+    oMessage,
+    alert,
+    survey,
+    onChange,
+    isInsertingOption,
+    payload,
+    closeFn,
+    onAddSurvey,
+    onUpdateSurvey,
+    initialState,
+  ]);
 
   return (
     <Form.Container className="border w-full p-5" onSubmit={onSubmit}>
@@ -134,9 +175,30 @@ const SurveyMakeForm = ({
       </Container.Row>
 
       <Container.Col className="gap-y-2.5">
-        <ul>
-          {survey.options.map((option) => (
-            <li key={option}>{option}</li>
+        <ul className="flex flex-col gap-y-1.5">
+          {survey.options.map((option, index) => (
+            <li key={option}>
+              <Button.Opacity
+                className="w-full"
+                onClick={() =>
+                  alert("삭제하시겠습니까?", [
+                    { text: "취소" },
+                    {
+                      text: "삭제",
+                      onClick: () =>
+                        setSurvey((prev) => ({
+                          ...prev,
+                          options: prev.options.filter(
+                            (item) => item !== option
+                          ),
+                        })),
+                    },
+                  ])
+                }
+              >
+                {index + 1}. {option}
+              </Button.Opacity>
+            </li>
           ))}
         </ul>
 
@@ -151,7 +213,10 @@ const SurveyMakeForm = ({
               if (e.nativeEvent.isComposing) {
                 return;
               }
-              if (stringValidator(option) && oMessage) {
+              if (!isInsertingOption && !oMessage) {
+                return;
+              }
+              if (stringValidator(option)) {
                 return alert("옵션을 입력해주세요.", [
                   { onClick: () => focus("options") },
                 ]);

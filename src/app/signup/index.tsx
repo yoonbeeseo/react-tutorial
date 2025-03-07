@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Form, Button, Typo } from "../../components";
 import { useCallback, useState, useMemo, useRef } from "react";
@@ -14,8 +15,10 @@ import {
   heightWeightValidator,
   mobileValidator,
   stringValidator,
+  dbService,
 } from "../../lib";
 import { Alert } from "../../contexts";
+import { v4 } from "uuid";
 
 const Signup = () => {
   const content = useSearchParams()[0].get("content");
@@ -390,7 +393,7 @@ const Signup = () => {
   );
 
   const { alert } = Alert.use();
-  const onSubmit = useCallback(() => {
+  const onSubmit = useCallback(async () => {
     const next = () => navi(`/signup?content=${Number(content) + 1}`);
 
     if (!content) {
@@ -467,7 +470,17 @@ const Signup = () => {
           return alert(pointMessage, [{ onClick: () => focus("points") }]);
         }
 
-        return console.log(props);
+        try {
+          const id = v4();
+          const ref = dbService.collection("users").doc(id);
+          const hashedPassword = await bcrypt.hash(pws.pw, 12);
+
+          await ref.set({ ...props, password: hashedPassword, id });
+          alert("회원가입을 축하드립니다!");
+        } catch (error: any) {
+          return alert(error.message);
+        }
+        return;
     }
   }, [
     navi,
@@ -493,6 +506,7 @@ const Signup = () => {
     interestMessage,
     pointMessage,
     props,
+    pws.pw,
   ]);
 
   return (

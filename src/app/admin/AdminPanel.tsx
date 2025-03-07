@@ -1,11 +1,11 @@
 import { useMemo, useState, useRef, useCallback, useEffect } from "react";
 import { dbService } from "../../lib";
-import { Container, Form, Button } from "../../components";
+import { Container, Button, Typo } from "../../components";
 import SurveyMakeForm from "./SurveyMakeForm";
 
 const AdminPanel = () => {
   const [surveys, setSurveys] = useState<Survey[]>([]);
-  const [isAdding, setIsAdding] = useState(true);
+  const [isAdding, setIsAdding] = useState(false);
 
   const addHandler = useCallback(() => setIsAdding((prev) => !prev), []);
 
@@ -34,8 +34,11 @@ const AdminPanel = () => {
 
   useEffect(() => {
     const subSurvey = ref.onSnapshot((snap) => {
-      const data = snap.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-      console.log(data);
+      const data = snap.docs.map(
+        (doc) => ({ ...doc.data(), id: doc.id } as Survey)
+      );
+      // console.log(data);
+      setSurveys(data as Survey[]);
     });
 
     subSurvey;
@@ -45,19 +48,26 @@ const AdminPanel = () => {
   return (
     <>
       {isAdding ? (
-        <SurveyMakeForm />
+        <SurveyMakeForm closeFn={addHandler} onAddSurvey={onAddSurvey} />
       ) : (
-        <>
+        <Container.Col className="gap-y-2.5 mx-auto mt-5">
           <Button.Opacity onClick={addHandler}>
             설문지에 질문 추가하기
           </Button.Opacity>
 
           <ul>
             {surveys.map((survey) => (
-              <li key={survey.id}>{survey.q}</li>
+              <li key={survey.id}>
+                <Container.Col>
+                  <Typo.H1>{survey.q}</Typo.H1>
+                  {survey.options.map((option) => (
+                    <Button.Opacity key={option}>{option}</Button.Opacity>
+                  ))}
+                </Container.Col>
+              </li>
             ))}
           </ul>
-        </>
+        </Container.Col>
       )}
     </>
   );
