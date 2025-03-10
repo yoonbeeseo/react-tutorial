@@ -1,15 +1,19 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { dbService } from "../../../lib";
-import { Button } from "../../../components";
+import { Container } from "../../../components";
+import PercentageBar from "./PercentageBar";
 
 interface SurveyResponse {
   answers: string[][];
   id: string;
 }
 
+type AArray = number[][];
+
 const AdminStatsPage = () => {
   const [responses, setResponses] = useState<SurveyResponse[]>([]);
   const [surveys, setSurveys] = useState<Survey[]>([]);
+  const [percentages, setPercentages] = useState<AArray>([]);
 
   useEffect(() => {
     const subRes = dbService.collection("surveys").onSnapshot((snap) => {
@@ -43,7 +47,7 @@ const AdminStatsPage = () => {
     return subSurvey;
   }, []);
 
-  const onCheck = useCallback(() => {
+  useEffect(() => {
     const res = Array.from({ length: surveys.length }, (_, i) =>
       Array.from(
         {
@@ -65,52 +69,56 @@ const AdminStatsPage = () => {
       });
     });
 
-    console.log(res);
-
     const total = res.map((r) => {
       return r.reduce((a, b) => a + b, 0);
     });
 
-    console.log(total);
-
-    res.map((rs, ri) => {
+    const totalPercentages = res.map((rs, ri) => {
       const t = total[ri];
-      rs.map((rs, rsi) => {
+      return rs.map((rs) => {
         const per = (rs / t) * 100;
-        console.log(
-          `${ri + 1}번째 질문의 ${rsi + 1}번째 답변률은 ${per.toFixed(
-            2
-          )}%입니다.`
-        );
+        // console.log(
+        //   `${ri + 1}번째 질문의 ${rsi + 1}번째 답변률은 ${per.toFixed(
+        //     2
+        //   )}%입니다.`
+        // );
+
+        return per;
       });
     });
+
+    setPercentages(totalPercentages);
   }, [surveys, responses]);
+
+  useEffect(() => {
+    console.log(percentages);
+  }, [percentages]);
+
   return (
-    <div>
-      AdminStatsPage
-      <ul>
-        {responses.map((res) => (
-          <li key={res.id}>
-            <p>{res.id}</p>
-            <ul className="border">
-              {res.answers.map((a, index) => (
-                <li key={index}>
-                  Q{index + 1}.
-                  <ul>
-                    {a.map((answer, ai) => (
-                      <li key={ai}>{answer}</li>
-                    ))}
-                  </ul>
+    <ul className="flex flex-col gap-y-5 max-w-100 mx-auto mt-5">
+      {percentages.map((p, pi) => (
+        <li key={pi} className="flex flex-col gap-y-2.5">
+          <Container.Row className="flex-wrap items-center gap-x-2.5">
+            <p className="text-xl font-bold">
+              Q{pi + 1}. {surveys[pi].q}
+            </p>
+            <p className="text-xs text-gray-500">
+              {surveys[pi].isMultiple && "(중복선택가능)"}
+            </p>
+          </Container.Row>
+
+          <ul className="flex flex-col gap-y-1">
+            {surveys[pi].options.map((option, oi) => {
+              return (
+                <li key={oi}>
+                  <PercentageBar per={p[oi]} answer={option} />
                 </li>
-              ))}
-            </ul>
-          </li>
-        ))}
-      </ul>
-      <Button.Opacity className="w-full" onClick={onCheck}>
-        Check
-      </Button.Opacity>
-    </div>
+              );
+            })}
+          </ul>
+        </li>
+      ))}
+    </ul>
   );
 };
 
