@@ -52,7 +52,6 @@ const Content_4 = ({
             {target === "i" ? "관심사" : "호감 포인트"}
           </Form.Label>
           <Form.Select
-            ref={target === "i" ? iRef : pRef}
             onChange={(e) => {
               if (target === "i") {
                 setIs((prev) => {

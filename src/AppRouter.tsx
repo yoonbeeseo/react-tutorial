@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./app/index";
 import Signup from "./app/signup/index";
+import Signin from "./app/signin/index";
 import CRUD from "./app/crud/index";
 import { AlertComponent } from "./components";
 import AdminPage from "./app/admin/index";
@@ -19,6 +20,7 @@ const AppRouter = () => {
           <Route path="*" element={<h1>Page Not Found return home</h1>} />
           <Route path="/" Component={Home} />
           <Route path="signup" Component={Signup} />
+          <Route path="signin" Component={Signin} />
           <Route path="crud" Component={CRUD} />
           {user && <Route path="survey" Component={SurveyPage} />}
 
