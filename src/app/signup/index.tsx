@@ -472,14 +472,22 @@ const Signup = () => {
 
         try {
           const id = v4();
-          const ref = dbService.collection("users").doc(id);
-          const hashedPassword = await bcrypt.hash(pws.pw, 12);
+          const hashPassword = await bcrypt.hash(pws.pw, 12);
 
-          await ref.set({ ...props, password: hashedPassword, id });
-          alert("회원가입을 축하드립니다!");
+          const newUser: User = { ...props, id };
+          const ref = dbService.collection("users").doc(id);
+
+          await ref.set({ ...newUser, password: hashPassword });
+
+          localStorage.setItem("uid", JSON.stringify(id));
+          console.log("uid stored");
+
+          alert("회원가입을 축하합니다.");
+          navi("/survey");
         } catch (error: any) {
           return alert(error.message);
         }
+
         return;
     }
   }, [

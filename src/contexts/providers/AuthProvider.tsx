@@ -50,8 +50,30 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   useEffect(() => {
-    console.log({ admin });
-  }, [admin]);
+    const uid = localStorage.getItem("uid");
+    if (uid) {
+      const id = JSON.parse(uid);
+      if (id) {
+        const fetchUser = async () => {
+          const ref = dbService.collection("users").doc(id);
+          const snap = await ref.get();
+          const data = snap.data();
+          if (data) {
+            delete data.password;
+
+            setUser(data as User);
+          } else {
+            console.log("No Such User");
+            setUser(null);
+          }
+        };
+        fetchUser();
+        return () => {
+          fetchUser();
+        };
+      }
+    }
+  }, []);
 
   return (
     <Auth.context.Provider
